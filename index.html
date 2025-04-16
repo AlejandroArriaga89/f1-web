@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>F1 App | Estadísticas en Tiempo Real</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container my-4">
+      <h1 class="text-center mb-4">🏎️ Fórmula 1</h1>
+
+      <div class="row">
+        <div class="col-md-6">
+          <h3>Carreras pasadas</h3>
+          <ul id="races-list" class="list-group"></ul>
+        </div>
+        <div class="col-md-6">
+          <h3>Top Pilotos</h3>
+          <table id="drivers-table" class="table table-striped">
+            <thead>
+              <tr>
+                <th>Posición</th>
+                <th>Nombre</th>
+                <th>Equipo</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS + Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Nuestro JS -->
+    <script src="app.js"></script>
+  </body>
+</html>
