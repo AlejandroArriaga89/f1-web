@@ -56,6 +56,55 @@ async function loadDrivers(session_key, meeting_key) {
   });
 }
 
+// 4. Nueva función: Mostrar posiciones finales de la carrera
+async function loadRaceResults(session_key, meeting_key) {
+  // Obtener posiciones finales (filtramos posición < 23 para evitar datos inconsistentes)
+  const positionsData = await fetchF1Data(
+    `https://api.openf1.org/v1/position?session_key=${session_key}&position<23`
+  );
+
+  // Obtener información de pilotos para cruzar datos
+  const driversData = await fetchF1Data(
+    `https://api.openf1.org/v1/drivers?meeting_key=${meeting_key}`
+  );
+
+  // Crear un mapa {driver_number: full_name}
+  const driversMap = {};
+  driversData.forEach((driver) => {
+    driversMap[driver.driver_number] = driver.full_name;
+  });
+
+  // Procesar posiciones (ordenar y tomar la última actualización por piloto)
+  const latestPositions = {};
+  positionsData.forEach((pos) => {
+    if (
+      !latestPositions[pos.driver_number] ||
+      new Date(pos.date) > new Date(latestPositions[pos.driver_number].date)
+    ) {
+      latestPositions[pos.driver_number] = pos;
+    }
+  });
+
+  // Convertir a array y ordenar por posición
+  const sortedPositions = Object.values(latestPositions).sort(
+    (a, b) => a.position - b.position
+  );
+
+  // Mostrar en la tabla
+  const resultsTable = document.querySelector("#results-table tbody");
+  resultsTable.innerHTML = "";
+
+  sortedPositions.forEach((pos) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${pos.position}</td>
+      <td>${driversMap[pos.driver_number] || `Piloto ${pos.driver_number}`}</td>
+      <td>${pos.driver_number}</td>
+    `;
+    resultsTable.appendChild(row);
+  });
+}
+
 // Cargar datos al iniciar
 document.addEventListener("DOMContentLoaded", () => {
   loadRaces();
@@ -70,7 +119,8 @@ function addRaceClickListeners() {
       const sessionKey = clickedItem.dataset.session_key;
       const meetingKey = clickedItem.dataset.meeting_key;
       console.log(sessionKey);
-      loadDrivers(sessionKey, meetingKey);
+      // loadDrivers(sessionKey, meetingKey);
+      loadRaceResults(sessionKey, meetingKey); // Llamada a la nueva función
     }
   });
 }
