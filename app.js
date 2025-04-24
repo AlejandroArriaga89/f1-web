@@ -23,7 +23,9 @@ async function loadRaces() {
     listItem.dataset.meeting_key = race.meeting_key;
     listItem.innerHTML = `
             <strong>${race.location} ${race.country_name}</strong><br>
-            <small>${race.country_code} (${race.date_start})</small>
+            <small><img src="https://flagsapi.com/${
+              pais[race.country_name]
+            }/flat/16.png"> ${race.country_code} (${race.date_start})</small>
         `;
     racesList.appendChild(listItem);
   });
@@ -71,7 +73,12 @@ async function loadRaceResults(session_key, meeting_key) {
   // Crear un mapa {driver_number: full_name}
   const driversMap = {};
   driversData.forEach((driver) => {
-    driversMap[driver.driver_number] = driver.full_name;
+    driversMap[driver.driver_number] = {
+      name: driver.full_name,
+      color: driver.team_colour,
+      team_name: driver.team_name,
+      face: driver.headshot_url,
+    };
   });
 
   // Procesar posiciones (ordenar y tomar la última actualización por piloto)
@@ -95,10 +102,23 @@ async function loadRaceResults(session_key, meeting_key) {
   resultsTable.innerHTML = "";
 
   sortedPositions.forEach((pos) => {
+    const driverInfo = driversMap[pos.driver_number] || {
+      name: `Piloto ${pos.driver_number}`,
+      color: "777777", // Color gris por defecto si no hay datos
+      team_name: "Equipo desconocido",
+      face: "Equipo desconocido",
+    };
+
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${pos.position}</td>
-      <td>${driversMap[pos.driver_number] || `Piloto ${pos.driver_number}`}</td>
+      <td class="row">
+        <div class="col-auto">
+          <img src="${driverInfo.face}" style="max-height: 10vh;"></div>
+        <div class="col">
+          ${driverInfo.name} <br> <span class="badge" style="background-color: #${driverInfo.color};">${driverInfo.team_name}</span>
+        </div>
+      </td>
       <td>${pos.driver_number}</td>
     `;
     resultsTable.appendChild(row);
